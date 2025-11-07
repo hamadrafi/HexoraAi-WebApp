@@ -15,30 +15,30 @@ window.addEventListener("load", adjustHeroSpacing);
 window.addEventListener("resize", adjustHeroSpacing);
 
 // Theme Toggle Functionality
+// Theme Toggle Functionality
 const themeToggle = document.getElementById("themeToggle");
-const body = document.body;
 const themeIcon = themeToggle.querySelector("i");
-const savedTheme = localStorage.getItem("theme");
 
-if (savedTheme === "dark") {
-  body.classList.add("dark-theme");
-  themeIcon.className = "fas fa-sun";
-} else {
-  body.classList.add("light-theme");
-  themeIcon.className = "fas fa-moon";
-}
+// Get saved theme OR default to dark
+const savedTheme = localStorage.getItem("theme") || "dark";
 
+// Apply theme instantly (no flash)
+document.documentElement.setAttribute("data-theme", savedTheme);
+
+// Set icon state
+themeIcon.className = savedTheme === "dark" ? "fas fa-sun" : "fas fa-moon";
+
+// Toggle on click
 themeToggle.addEventListener("click", () => {
-  if (body.classList.contains("light-theme")) {
-    body.classList.replace("light-theme", "dark-theme");
-    themeIcon.className = "fas fa-sun";
-    localStorage.setItem("theme", "dark");
-  } else {
-    body.classList.replace("dark-theme", "light-theme");
-    themeIcon.className = "fas fa-moon";
-    localStorage.setItem("theme", "light");
-  }
+  const currentTheme = document.documentElement.getAttribute("data-theme");
+  const newTheme = currentTheme === "dark" ? "light" : "dark";
+
+  document.documentElement.setAttribute("data-theme", newTheme);
+  localStorage.setItem("theme", newTheme);
+
+  themeIcon.className = newTheme === "dark" ? "fas fa-sun" : "fas fa-moon";
 });
+
 
 // Custom Scroll Animation
 function animateOnScroll() {
