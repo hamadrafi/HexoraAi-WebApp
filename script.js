@@ -1,54 +1,44 @@
-  //Hero Section Spacing
-  const navbar = document.querySelector(".navbar");
-  const hero = document.querySelector(".hero");
+//Hero Section Spacing
+const navbar = document.querySelector(".navbar");
+const hero = document.querySelector(".hero");
 
-  function adjustHeroSpacing() {
-    const navHeight = navbar.offsetHeight;
-    if (window.innerWidth <= 991) {
-      // Small devices → add some extra space
-      hero.style.paddingTop = navHeight + 20 + "px";
-    } else {
-      // Large screens → just use navbar height
-      hero.style.paddingTop = navHeight + "px";
-    }
+function adjustHeroSpacing() {
+  const navHeight = navbar.offsetHeight;
+  if (window.innerWidth <= 991) {
+    hero.style.paddingTop = navHeight + 20 + "px";
+  } else {
+    hero.style.paddingTop = navHeight + "px";
   }
+}
 
-  window.addEventListener("load", adjustHeroSpacing);
-  window.addEventListener("resize", adjustHeroSpacing);
+window.addEventListener("load", adjustHeroSpacing);
+window.addEventListener("resize", adjustHeroSpacing);
 
 // Theme Toggle Functionality
 const themeToggle = document.getElementById("themeToggle");
 const body = document.body;
 const themeIcon = themeToggle.querySelector("i");
-
-// Check saved theme on load
 const savedTheme = localStorage.getItem("theme");
 
 if (savedTheme === "dark") {
   body.classList.add("dark-theme");
-  body.classList.remove("light-theme");
   themeIcon.className = "fas fa-sun";
 } else {
   body.classList.add("light-theme");
-  body.classList.remove("dark-theme");
   themeIcon.className = "fas fa-moon";
 }
 
-// Toggle theme on click
 themeToggle.addEventListener("click", () => {
   if (body.classList.contains("light-theme")) {
-    body.classList.remove("light-theme");
-    body.classList.add("dark-theme");
+    body.classList.replace("light-theme", "dark-theme");
     themeIcon.className = "fas fa-sun";
     localStorage.setItem("theme", "dark");
   } else {
-    body.classList.remove("dark-theme");
-    body.classList.add("light-theme");
+    body.classList.replace("dark-theme", "light-theme");
     themeIcon.className = "fas fa-moon";
     localStorage.setItem("theme", "light");
   }
 });
-
 
 // Custom Scroll Animation
 function animateOnScroll() {
@@ -59,53 +49,56 @@ function animateOnScroll() {
     const windowHeight = window.innerHeight;
 
     if (elementTop < windowHeight - 100) {
+      element.style.opacity = "1";
+      element.style.transform = "translateY(0)";
+
       if (element.classList.contains("feature-card")) {
         element.style.animation = "fadeIn 0.8s ease forwards";
-        element.style.opacity = "1";
-        element.style.transform = "translateY(0)";
-      } else if (element.classList.contains("stat-item")) {
-        element.style.animation = "fadeIn 0.6s ease forwards";
-        element.style.opacity = "1";
-        element.style.transform = "translateY(0)";
+      }
 
-        // Animate counter
+      // ✅ Improved Counter Animation (No Overlap + Slower + Runs Once)
+      if (element.classList.contains("stat-item")) {
         const counter = element.querySelector(".stat-number");
-        const target = parseInt(counter.getAttribute("data-count"));
-        let current = 0;
-        const increment = target / 100;
 
-        const timer = setInterval(() => {
-          current += increment;
-          if (current >= target) {
-            current = target;
-            clearInterval(timer);
-          }
-          counter.textContent = Math.floor(current).toLocaleString();
-        }, 20);
-      } else if (element.classList.contains("testimonial-card")) {
+        if (!counter.dataset.done) {
+          const target = parseInt(counter.getAttribute("data-count"));
+          let current = 0;
+          const increment = target / 200; // slower
+
+          const timer = setInterval(() => {
+            current += increment;
+
+            if (current >= target) {
+              current = target;
+              clearInterval(timer);
+            }
+
+            counter.textContent = Math.floor(current).toLocaleString();
+          }, 30); // slower update speed
+
+          counter.dataset.done = "true"; // prevents rerun
+        }
+      }
+
+      if (element.classList.contains("testimonial-card")) {
         element.style.animation = "slideInLeft 0.8s ease forwards";
-        element.style.opacity = "1";
-        element.style.transform = "translateX(0)";
       }
     }
   });
 }
 
-// Smooth scrolling for navigation links
+// Smooth Scrolling
 document.querySelectorAll('a[href^="#"]').forEach((anchor) => {
   anchor.addEventListener("click", function (e) {
     e.preventDefault();
-    const target = document.querySelector(this.getAttribute("href"));
-    if (target) {
-      target.scrollIntoView({
-        behavior: "smooth",
-        block: "start",
-      });
-    }
+    document.querySelector(this.getAttribute("href")).scrollIntoView({
+      behavior: "smooth",
+      block: "start",
+    });
   });
 });
 
-// Navbar scroll effect
+// Navbar Scroll Effect
 window.addEventListener("scroll", () => {
   const navbar = document.querySelector(".navbar");
   if (window.scrollY > 50) {
@@ -115,39 +108,33 @@ window.addEventListener("scroll", () => {
     navbar.style.padding = "1rem 0";
     navbar.style.boxShadow = "none";
   }
-
   animateOnScroll();
 });
 
-// Initialize animations on page load
+// Run on load
 window.addEventListener("load", () => {
   animateOnScroll();
 });
 
-// Parallax effect for floating elements
+// Parallax Elements
 window.addEventListener("scroll", () => {
   const scrolled = window.pageYOffset;
-  const parallax = document.querySelectorAll(".floating-element");
-  const speed = 0.5;
-
-  parallax.forEach((element) => {
-    const yPos = -(scrolled * speed);
-    element.style.transform = `translateY(${yPos}px)`;
+  document.querySelectorAll(".floating-element").forEach((element) => {
+    element.style.transform = `translateY(${-scrolled * 0.5}px)`;
   });
 });
 
-// Add interactive hover effects
+// Feature Card Hover
 document.querySelectorAll(".feature-card").forEach((card) => {
   card.addEventListener("mouseenter", function () {
     this.style.transform = "translateY(-10px) scale(1.02)";
   });
-
   card.addEventListener("mouseleave", function () {
     this.style.transform = "translateY(0) scale(1)";
   });
 });
 
-// Newsletter subscription (demo)
+// Newsletter Demo
 const emailInput = document.querySelector('input[type="email"]');
 const subscribeBtn = document.querySelector(".input-group .btn");
 
