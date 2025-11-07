@@ -1,42 +1,52 @@
-//Hero Section Spacing
-const navbar = document.querySelector(".navbar");
-const hero = document.querySelector(".hero");
+ //Hero Section Spacing
+  const navbar = document.querySelector(".navbar");
+  const hero = document.querySelector(".hero");
 
-function adjustHeroSpacing() {
-  const navHeight = navbar.offsetHeight;
-  if (window.innerWidth <= 991) {
-    hero.style.paddingTop = navHeight + 20 + "px";
-  } else {
-    hero.style.paddingTop = navHeight + "px";
+  function adjustHeroSpacing() {
+    const navHeight = navbar.offsetHeight;
+    if (window.innerWidth <= 991) {
+      // Small devices → add some extra space
+      hero.style.paddingTop = navHeight + 20 + "px";
+    } else {
+      // Large screens → just use navbar height
+      hero.style.paddingTop = navHeight + "px";
+    }
   }
-}
 
-window.addEventListener("load", adjustHeroSpacing);
-window.addEventListener("resize", adjustHeroSpacing);
+  window.addEventListener("load", adjustHeroSpacing);
+  window.addEventListener("resize", adjustHeroSpacing);
 
-// Theme Toggle Functionality
 // Theme Toggle Functionality
 const themeToggle = document.getElementById("themeToggle");
+const body = document.body;
 const themeIcon = themeToggle.querySelector("i");
 
-// Get saved theme OR default to dark
-const savedTheme = localStorage.getItem("theme") || "dark";
+// Check saved theme on load
+const savedTheme = localStorage.getItem("theme");
 
-// Apply theme instantly (no flash)
-document.documentElement.setAttribute("data-theme", savedTheme);
+if (savedTheme === "dark") {
+  body.classList.add("dark-theme");
+  body.classList.remove("light-theme");
+  themeIcon.className = "fas fa-sun";
+} else {
+  body.classList.add("light-theme");
+  body.classList.remove("dark-theme");
+  themeIcon.className = "fas fa-moon";
+}
 
-// Set icon state
-themeIcon.className = savedTheme === "dark" ? "fas fa-sun" : "fas fa-moon";
-
-// Toggle on click
+// Toggle theme on click
 themeToggle.addEventListener("click", () => {
-  const currentTheme = document.documentElement.getAttribute("data-theme");
-  const newTheme = currentTheme === "dark" ? "light" : "dark";
-
-  document.documentElement.setAttribute("data-theme", newTheme);
-  localStorage.setItem("theme", newTheme);
-
-  themeIcon.className = newTheme === "dark" ? "fas fa-sun" : "fas fa-moon";
+  if (body.classList.contains("light-theme")) {
+    body.classList.remove("light-theme");
+    body.classList.add("dark-theme");
+    themeIcon.className = "fas fa-sun";
+    localStorage.setItem("theme", "dark");
+  } else {
+    body.classList.remove("dark-theme");
+    body.classList.add("light-theme");
+    themeIcon.className = "fas fa-moon";
+    localStorage.setItem("theme", "light");
+  }
 });
 
 
@@ -49,56 +59,53 @@ function animateOnScroll() {
     const windowHeight = window.innerHeight;
 
     if (elementTop < windowHeight - 100) {
-      element.style.opacity = "1";
-      element.style.transform = "translateY(0)";
-
       if (element.classList.contains("feature-card")) {
         element.style.animation = "fadeIn 0.8s ease forwards";
-      }
+        element.style.opacity = "1";
+        element.style.transform = "translateY(0)";
+      } else if (element.classList.contains("stat-item")) {
+        element.style.animation = "fadeIn 0.6s ease forwards";
+        element.style.opacity = "1";
+        element.style.transform = "translateY(0)";
 
-      // ✅ Improved Counter Animation (No Overlap + Slower + Runs Once)
-      if (element.classList.contains("stat-item")) {
+        // Animate counter
         const counter = element.querySelector(".stat-number");
+        const target = parseInt(counter.getAttribute("data-count"));
+        let current = 0;
+        const increment = target / 100;
 
-        if (!counter.dataset.done) {
-          const target = parseInt(counter.getAttribute("data-count"));
-          let current = 0;
-          const increment = target / 400; // slower
-
-          const timer = setInterval(() => {
-            current += increment;
-
-            if (current >= target) {
-              current = target;
-              clearInterval(timer);
-            }
-
-            counter.textContent = Math.floor(current).toLocaleString();
-          }, 30); // slower update speed
-
-          counter.dataset.done = "true"; // prevents rerun
-        }
-      }
-
-      if (element.classList.contains("testimonial-card")) {
+        const timer = setInterval(() => {
+          current += increment;
+          if (current >= target) {
+            current = target;
+            clearInterval(timer);
+          }
+          counter.textContent = Math.floor(current).toLocaleString();
+        }, 20);
+      } else if (element.classList.contains("testimonial-card")) {
         element.style.animation = "slideInLeft 0.8s ease forwards";
+        element.style.opacity = "1";
+        element.style.transform = "translateX(0)";
       }
     }
   });
 }
 
-// Smooth Scrolling
+// Smooth scrolling for navigation links
 document.querySelectorAll('a[href^="#"]').forEach((anchor) => {
   anchor.addEventListener("click", function (e) {
     e.preventDefault();
-    document.querySelector(this.getAttribute("href")).scrollIntoView({
-      behavior: "smooth",
-      block: "start",
-    });
+    const target = document.querySelector(this.getAttribute("href"));
+    if (target) {
+      target.scrollIntoView({
+        behavior: "smooth",
+        block: "start",
+      });
+    }
   });
 });
 
-// Navbar Scroll Effect
+// Navbar scroll effect
 window.addEventListener("scroll", () => {
   const navbar = document.querySelector(".navbar");
   if (window.scrollY > 50) {
@@ -108,33 +115,39 @@ window.addEventListener("scroll", () => {
     navbar.style.padding = "1rem 0";
     navbar.style.boxShadow = "none";
   }
+
   animateOnScroll();
 });
 
-// Run on load
+// Initialize animations on page load
 window.addEventListener("load", () => {
   animateOnScroll();
 });
 
-// Parallax Elements
+// Parallax effect for floating elements
 window.addEventListener("scroll", () => {
   const scrolled = window.pageYOffset;
-  document.querySelectorAll(".floating-element").forEach((element) => {
-    element.style.transform = `translateY(${-scrolled * 0.5}px)`;
+  const parallax = document.querySelectorAll(".floating-element");
+  const speed = 0.5;
+
+  parallax.forEach((element) => {
+    const yPos = -(scrolled * speed);
+    element.style.transform = `translateY(${yPos}px)`;
   });
 });
 
-// Feature Card Hover
+// Add interactive hover effects
 document.querySelectorAll(".feature-card").forEach((card) => {
   card.addEventListener("mouseenter", function () {
     this.style.transform = "translateY(-10px) scale(1.02)";
   });
+
   card.addEventListener("mouseleave", function () {
     this.style.transform = "translateY(0) scale(1)";
   });
 });
 
-// Newsletter Demo
+// Newsletter subscription (demo)
 const emailInput = document.querySelector('input[type="email"]');
 const subscribeBtn = document.querySelector(".input-group .btn");
 
