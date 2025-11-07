@@ -63,7 +63,7 @@ function animateOnScroll() {
         if (!counter.dataset.done) {
           const target = parseInt(counter.getAttribute("data-count"));
           let current = 0;
-          const increment = target / 200; // slower
+          const increment = target / 400; // slower
 
           const timer = setInterval(() => {
             current += increment;
